@@ -120,6 +120,7 @@ function solve(p::AbstractRCSProblem, ::Type{NodeSolver}, ::Type{F}) where {F<:A
     dests = _dests_scratch(p, R)
 
     while !isempty(heap)
+        @invariant table.incumbent_index == 0 || is_feasible(p, table.resource[table.incumbent_index], dst)
         origin = pop!(heap)
         in_heap[origin] = false
         front = fronts[origin]
@@ -173,6 +174,7 @@ function solve(p::AbstractRCSProblem, ::Type{PathSolver}, ::Type{F}) where {F<:A
     dests = _dests_scratch(p, R)
 
     while !isempty(heap)
+        @invariant table.incumbent_index == 0 || is_feasible(p, table.resource[table.incumbent_index], dst)
         pi = pop!(heap)
         origin = @inbounds table.node[pi]
         r = @inbounds table.resource[pi]

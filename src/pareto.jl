@@ -35,6 +35,11 @@ end
 
 Drop the entries dominated by candidate `r` (order preserving, port of
 `add_dominant_path`) then append label `i` flagged extensible.
+
+# Contracts
+- `@requires 1 <= i`
+- `@ensures any(k -> f.index[k] == i, eachindex(f.index))`
+- `@ensures !any(k -> dominates(p, r, f.resource[k]), eachindex(f.resource))`
 """
 function add_dominant!(p, f::ExtensibleFront{R}, i::Integer, r::R) where {R}
     idx = f.index
@@ -107,7 +112,16 @@ EfficientFront{R}() where {R} = EfficientFront{R}(Int[], R[])
     return f
 end
 
-"Drop entries dominated by candidate `r`, then append label `i` (order preserving)."
+"""
+    add_dominant!(p, f::EfficientFront, i, r) -> f
+
+Drop entries dominated by candidate `r`, then append label `i` (order preserving).
+
+# Contracts
+- `@requires 1 <= i`
+- `@ensures any(k -> f.index[k] == i, eachindex(f.index))`
+- `@ensures !any(k -> dominates(p, r, f.resource[k]), eachindex(f.resource))`
+"""
 function add_dominant!(p, f::EfficientFront{R}, i::Integer, r::R) where {R}
     idx = f.index
     res = f.resource

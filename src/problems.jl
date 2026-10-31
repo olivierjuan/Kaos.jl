@@ -50,6 +50,9 @@ resource dynamics.
     is_feasible(p, r, n) -> Bool
 
 Feasibility of holding resource `r` at node `n` (port of `is_feasible`).
+
+# Contracts
+- `@requires 1 <= n`
 """
 is_feasible(p, r, n) = true
 

@@ -20,6 +20,10 @@ const KERNEL_FUNCTIONS = [
     Kaos.add_path!,
     Kaos.update_incumbent!,
     Kaos.is_candidate,
+    Kaos.is_feasible,
+    Kaos.front_dominates,
+    Kaos.add_dominant!,
+    Kaos._extend_batch!,
     Kaos.solve,
 ]
 
