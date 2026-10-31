@@ -32,12 +32,6 @@ const KERNEL_NAMES = [nameof(f) for f in KERNEL_FUNCTIONS]
 # Dynamic contracted wrapper helper for runtime checking (from docstrings)
 contracted(f::Function) = JuLean.contracted(f)
 
-# Backward-compatible aliases delegating to the real functions' docstring contracts
-dbc_dominates(a, b) = contracted(Kaos.dominates)(a, b)
-dbc_add_path!(t, r, n, a, p) = contracted(Kaos.add_path!)(t, r, n, a, p)
-dbc_update_incumbent!(t, i) = contracted(Kaos.update_incumbent!)(t, i)
-dbc_is_candidate_bounded(cost::Real, bound::Real, incumbent::Real) =
-    contracted(Kaos.is_candidate)(Kaos.BoundedFilter([bound]), nothing, SVector(cost, 0.0), 1, incumbent)
 function __init__()
     # 1. Formalize real Kaos kernels from docstrings
     for f in KERNEL_FUNCTIONS
