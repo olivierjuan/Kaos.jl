@@ -38,8 +38,8 @@ Drop the entries dominated by candidate `r` (order preserving, port of
 
 # Contracts
 - `@requires 1 <= i`
-- `@ensures any(k -> f.index[k] == i, eachindex(f.index))`
-- `@ensures !any(k -> dominates(p, r, f.resource[k]), eachindex(f.resource))`
+- `@ensures any(k -> result.index[k] == i, eachindex(result.index))`
+- `@ensures !any(k -> dominates(p, r, result.resource[k]), eachindex(result.resource))`
 """
 function add_dominant!(p, f::ExtensibleFront{R}, i::Integer, r::R) where {R}
     idx = f.index
@@ -119,8 +119,8 @@ Drop entries dominated by candidate `r`, then append label `i` (order preserving
 
 # Contracts
 - `@requires 1 <= i`
-- `@ensures any(k -> f.index[k] == i, eachindex(f.index))`
-- `@ensures !any(k -> dominates(p, r, f.resource[k]), eachindex(f.resource))`
+- `@ensures any(k -> result.index[k] == i, eachindex(result.index))`
+- `@ensures !any(k -> dominates(p, r, result.resource[k]), eachindex(result.resource))`
 """
 function add_dominant!(p, f::EfficientFront{R}, i::Integer, r::R) where {R}
     idx = f.index

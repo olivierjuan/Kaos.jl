@@ -164,7 +164,7 @@ end
 
 # ---- the proof --------------------------------------------------------------
 
-@testset "formal end-to-end: exhaustive-oracle optimality on 100 random instances" begin
+@testset "Exhaustive DFS Oracle (100 random instances)" begin
     n_checked = 0
     for seed in 1:100
         rng = MersenneTwister(seed)
