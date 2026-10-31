@@ -3,7 +3,7 @@
 Statut : **15/15 vérifications machine** — Z3 (5 règles sur ℚ), BMC (2 noyaux
 boucle/tableaux), noyau Lean 4 + Mathlib (8, sans `sorry`) —,
 **5 445 assertions end-to-end vertes** sur 100 instances aléatoires.
-Harnais : `formal/verify_kernels.jl` (`julia --project=formal formal/verify_kernels.jl`).
+Harnais : `test/test_formal_verification.jl` (`julia --project=. test/runtests.jl`).
 Approche Sirocco.jl : tout le code de vérification vit dans `ext/KaosJuLeanExt`
 (weak dependency — `src/` inchangé).
 
@@ -44,13 +44,12 @@ vivent directement dans les docstrings Markdown des fonctions de `src/` (`Kaos.d
 `Kaos.add_path!`, `Kaos.update_incumbent!`, `Kaos.is_candidate`), sans aucun surcoût ni
 dépendance en production.
 
-Via `JuLean.contracted(...)`, 64 000 appels contractuels sont martelés sur données
-aléatoires dans `formal/verify_kernels.jl` : `Kaos.dominates` (20 000 paires, N∈2..4),
-`Kaos.add_path!` + `Kaos.update_incumbent!` (24 000 appels), `Kaos.is_candidate` (20 000
-triples). Toute divergence des noyaux réels par rapport aux specs ci-dessus
-lèverait `ContractViolationError`.
+Via `JuLean.contracted(...)`, les contrats sont martelés sur données aléatoires
+dans `test/test_formal_verification.jl` : `Kaos.dominates`, `Kaos.add_path!`,
+`Kaos.update_incumbent!`, `Kaos.is_candidate`. Toute divergence des noyaux réels
+par rapport aux specs ci-dessus lèverait `ContractViolationError`.
 
-## 2. Preuve bout-en-bout (indépendante de JuLean, `test/test_formal_verification.jl`)
+## 2. Preuve bout-en-bout (oracles indépendants, `test/test_oracle.jl`)
 
 100 instances aléatoires (multigraphes DAG en couches, 2–3 dimensions de
 ressource, budgets variés, arcs parallèles) × 4 combinaisons
@@ -113,9 +112,6 @@ dans [RCSPP_DESIGN.md](RCSPP_DESIGN.md).
 ## 4. Reproduction
 
 ```bash
-julia --project=. test/runtests.jl            # inclut la preuve end-to-end
-julia --project=formal formal/verify_kernels.jl   # Z3 + DbC + Lean (proj. Mathlib ~/dunes/formalization)
+julia --project=. test/runtests.jl            # exécute les tests unitaires, oracles exhaustifs et vérification formelle JuLean (Z3 + DbC + BMC + Lean 4)
+cd ../../dunes/formalization && lake build DunesLean.RCSPP   # certification universelle de l'algorithme en Lean 4
 ```
-
-`formal/Project.toml` référence JuLean via `[sources]` (chemin relatif
-`../../../dunes/JuLean.jl`) — ajuster si l'arborescence diffère.

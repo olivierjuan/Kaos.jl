@@ -18,6 +18,7 @@ julia = "1.10"
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+JuLean = "60d1f2a1-a197-4d78-8ba3-1a6337fe4745"
 
 [targets]
-test = ["Test", "Random"]
+test = ["Test", "Random", "JuLean"]

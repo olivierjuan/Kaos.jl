@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "8e217449a4301790ce83cf46dc0321c239fce686"
+project_hash = "aa87b75ee62ccf59b4e6223f1ea5b0d3f615c6f1"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -18,11 +18,38 @@ deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 version = "1.11.0"
 
+[[deps.GMP_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "781609d7-10c4-51f6-84f2-b8444358ff6d"
+version = "6.3.0+2"
+
+[[deps.JLLWrappers]]
+deps = ["Artifacts", "Preferences"]
+git-tree-sha1 = "7204148362dafe5fe6a273f855b8ccbe4df8173e"
+uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+version = "1.8.0"
+
+[[deps.JuLean]]
+deps = ["MacroTools", "z3_jll"]
+path = "../../dunes/JuLean.jl"
+uuid = "60d1f2a1-a197-4d78-8ba3-1a6337fe4745"
+version = "1.1.0"
+
+    [deps.JuLean.extensions]
+    JuLeanMetatheoryExt = "Metatheory"
+
+    [deps.JuLean.weakdeps]
+    Metatheory = "e9d8d322-4543-424a-9be4-0cc815abe26c"
+
 [[deps.Kaos]]
 deps = ["StaticArrays"]
 path = "."
 uuid = "2eb1110e-a7c5-42f1-bfc0-20b3dfaefc1f"
 version = "0.1.0"
+weakdeps = ["JuLean"]
+
+    [deps.Kaos.extensions]
+    KaosJuLeanExt = "JuLean"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -32,6 +59,11 @@ version = "1.11.0"
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.12.0"
+
+[[deps.MacroTools]]
+git-tree-sha1 = "1e0228a030642014fe5cfe68c2c0a818f9e3f522"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.16"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
@@ -96,3 +128,15 @@ version = "1.11.0"
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 version = "5.15.0+0"
+
+[[deps.libcxxwrap_julia_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "2eecfd1759a176424159c1993b66f012a230319f"
+uuid = "3eaa8342-bff7-56a5-9981-c04077f7cee7"
+version = "0.14.12+0"
+
+[[deps.z3_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "GMP_jll", "JLLWrappers", "Libdl", "libcxxwrap_julia_jll"]
+git-tree-sha1 = "4e2c8f811e46a40416778b2057a562582d9221f4"
+uuid = "1bc4e1ec-7839-5212-8f2f-0d16b7bd09bc"
+version = "4.16.0+0"
