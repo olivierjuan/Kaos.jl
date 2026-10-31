@@ -3,9 +3,6 @@ using Kaos
 using StaticArrays: SVector
 
 include("testproblem.jl")
-include("test_formal_verification.jl")
-include("test_oracle.jl")
-include("test_refinement.jl")
 
 """
     ReachabilityProblem
@@ -23,6 +20,13 @@ Kaos.dest_node(p::ReachabilityProblem) = p.dst
 Kaos.initial_resource(p::ReachabilityProblem) = SVector(0.0, 0.0)
 Kaos.arc_resource(p::ReachabilityProblem, a) = SVector(1.0, 0.0)
 
+const BEST_NODES = [1, 2, 5, 8, 11]  # C++ assert_best_path
+
+@testset "Kaos.jl" begin
+
+include("test_formal_verification.jl")
+include("test_oracle.jl")
+include("test_refinement.jl")
 @testset "BasicDirectedGraph" begin
     p = TestProblem()
     g = Kaos.graph(p)
@@ -56,7 +60,6 @@ end
     @test bounds ≈ oracle atol = 1e-12
 end
 
-const BEST_NODES = [1, 2, 5, 8, 11]  # C++ assert_best_path
 
 @testset "incumbent path [1,2,5,8,11] on all solver/filter combinations" begin
     p = TestProblem()
@@ -142,5 +145,6 @@ end
     @test isempty(Kaos.node_path(sol))
     @test isempty(Kaos.arc_path(sol))
     @test Kaos.incumbent_cost(sol) == typemax(Float64)
+end
 end
 
