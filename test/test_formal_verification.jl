@@ -19,7 +19,7 @@ end
 using JuLean
 using Kaos
 
-@testset "Kaos Formal Verification (JuLean.jl)" begin
+@testset "Kaos Formal Verification (JuLean.jl)" verbose = (@isdefined(TEST_VERBOSE) ? TEST_VERBOSE : false) begin
 
     # 1. Extension Verification
     @testset "1. Extension Initialization & Registry" begin
@@ -27,10 +27,18 @@ using Kaos
         @test isdefined(Kaos, :export_lean_specifications)
         EXT = Base.get_extension(Kaos, :KaosJuLeanExt)
         @test EXT isa Module
-
         for f in EXT.KERNEL_FUNCTIONS
             sname = nameof(f)
             @test haskey(JuLean.SPEC_REGISTRY, sname)
+            spec = JuLean.SPEC_REGISTRY[sname]
+            @test spec !== nothing
+        end
+
+        # Non-trivial contract inspection: ensuring docstring reflection captured result contracts
+        for s in [:dominates, :add_path!, :update_incumbent!, :is_candidate, :front_dominates, :add_dominant!, :solve]
+            spec = JuLean.SPEC_REGISTRY[s]
+            @test !isempty(spec.postconditions)
+            @test any(p -> occursin("result", string(p)), spec.postconditions)
         end
     end
 
@@ -94,5 +102,18 @@ using Kaos
                 @test res.status === JuLean.StatusVerified
             end
         end
+
+    # 6. Lean 4 Specification Export
+    @testset "6. Lean 4 Specification Export" begin
+        mktempdir() do tmp
+            export_path = joinpath(tmp, "KaosExport.lean")
+            Kaos.export_lean_specifications(export_path)
+            @test isfile(export_path)
+            content = read(export_path, String)
+            @test occursin("import Mathlib.Tactic", content)
+            @test occursin("kaos_dominance_additive_extension2", content)
+            @test occursin("kaos_incumbent_rule", content)
+        end
+    end
     end
 end

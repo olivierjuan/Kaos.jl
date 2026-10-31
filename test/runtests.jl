@@ -21,8 +21,9 @@ Kaos.initial_resource(p::ReachabilityProblem) = SVector(0.0, 0.0)
 Kaos.arc_resource(p::ReachabilityProblem, a) = SVector(1.0, 0.0)
 
 const BEST_NODES = [1, 2, 5, 8, 11]  # C++ assert_best_path
+const TEST_VERBOSE = "-v" in ARGS || "--verbose" in ARGS || get(ENV, "JULIA_TEST_VERBOSE", "0") in ("1", "true")
 
-@testset "Kaos.jl" begin
+@testset "Kaos.jl" verbose = TEST_VERBOSE begin
 
 include("test_formal_verification.jl")
 include("test_oracle.jl")
