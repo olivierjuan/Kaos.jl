@@ -20,11 +20,21 @@ Approche Sirocco.jl : tout le code de vérification vit dans `ext/KaosJuLeanExt`
 
 ### Tier 3 — noyau Lean 4 + Mathlib (certifié par le kernel, sans `sorry`)
 
-7/7 : asymétrie, transitivité, lemme d'élimination, monotonie du filtre, plus la
-décomposition par branche de la règle d'incumbent (`adopt`/`improve`/`hold`).
-La règle composée (if) reste au niveau Z3 : le transpilateur JuLean écrit les
-tactiques hors bloc `by` (limitation outillée, pas mathématique) et le terme
-`min`/les postconditions `!`-sur-`Bool` ne sont pas traduisibles symétriquement.
+8/8 : asymétrie, transitivité, lemme d'élimination, monotonie du filtre, la
+décomposition par branche de la règle d'incumbent (`adopt`/`improve`/`hold`)
+**et la règle composée (if) complète** — certifiée via une tactique de
+cas (`cases has_inc <;> simp [...] <;> by_cases h : prev > cand <;> simp [h]
+<;> linarith`) rendue possible par l'émission des tactiques custom dans un
+bloc `by` (JuLean `6db8c38`).
+
+### Tier 2 — BMC (boucle liée, tableaux SMT, `@ensures`) — JuLean `6db8c38`
+
+2/2 : extension batchée (`kaos_extend_batch_arr` : écritures `store`,
+lectures `select`, `@ensures` falsifiés sur l'état final) et scan de
+dominance en récursion d'état (`kaos_front_scan_arr` : variable de boucle
+liée à l'itération dépliée, accumulateur Bool). Sémantique vérifiée :
+« après exactement `depth` itérations complètes, invariants et postconditions
+tiennent » — la sortie anticipée de boucle reste hors modèle.
 
 ### Tier 0 — contrats DbC sur les noyaux RÉELS (exécution)
 

@@ -29,13 +29,17 @@ Z3_SPECS = [:kaos_dominance_asymmetry2,
             :kaos_incumbent_rule,
             :kaos_mincost_monotone]
 
-LEAN_SPECS = [:kaos_dominance_asymmetry2,
-              :kaos_dominance_transitivity2,
-              :kaos_dominance_additive_extension2,
-              :kaos_mincost_monotone,
-              :kaos_incumbent_adopt,
-              :kaos_incumbent_improve,
-              :kaos_incumbent_hold]
+LEAN_SPECS = [(:kaos_dominance_asymmetry2, ""),
+              (:kaos_dominance_transitivity2, ""),
+              (:kaos_dominance_additive_extension2, ""),
+              (:kaos_mincost_monotone, ""),
+              (:kaos_incumbent_adopt, ""),
+              (:kaos_incumbent_improve, ""),
+              (:kaos_incumbent_hold, ""),
+              (:kaos_incumbent_rule,
+               "cases has_inc <;> simp [kaos_incumbent_rule] <;> by_cases h : prev > cand <;> simp [h] <;> linarith")]
+BMC_SPECS = [(:kaos_extend_batch_arr, 4),
+             (:kaos_front_scan_arr, 4)]
 results = Tuple{String,String,JuLean.VerificationStatus}[]
 
 # ---------------- Tier 1: Z3 -----------------------------------------------
@@ -92,13 +96,25 @@ println("dbc_dominates: ", n_dom, " random pairs, contracts OK")
 println("dbc_add_path!/dbc_update_incumbent!: ", n_path, " contract-checked calls, contracts OK")
 println("dbc_is_candidate_bounded: ", n_cand, " random triples, contracts OK")
 
+
+# ---------------- Tier 2: BMC (loop variable + arrays + ensures) ------------
+println("\n=== Tier 2: BMC (boucle liée, tableaux SMT, @ensures) ===")
+for (name, depth) in BMC_SPECS
+    res = JuLean.verify(name; backend = :BMC, depth = depth)
+    push!(results, (string(name), "BMC", res.status))
+    println(rpad(name, 42), " → ", res.status, "  (depth=$depth)")
+    if res.status !== JuLean.StatusVerified
+        println("   message: ", res.message)
+    end
+end
+
 # ---------------- Tier 3: Lean 4 + Mathlib ---------------------------------
 println("\n=== Tier 3: Lean 4 kernel (Mathlib) ===")
 LEAN_PROJECT = "/home/D01856/dunes/formalization"
 if isdir(LEAN_PROJECT)
     JuLean.set_lean_project_dir!(LEAN_PROJECT)
-    for name in LEAN_SPECS
-        res = JuLean.verify(name; backend = :Lean4, timeout = 300.0)
+    for (name, tac) in LEAN_SPECS
+        res = JuLean.verify(name; backend = :Lean4, timeout = 300.0, tactic = tac)
         push!(results, (string(name), "Lean4", res.status))
         println(rpad(name, 42), " → ", res.status)
         if res.status !== JuLean.StatusVerified

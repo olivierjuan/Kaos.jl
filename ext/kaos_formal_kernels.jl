@@ -75,6 +75,29 @@ end
     prev
 end
 
+# ---- Tier 2: BMC kernels (loop variable bound, SMT Array store/select) ----
+
+# Extension batchée: après 3 itérations, chaque case vaut r + ss[i]. Le BMC
+# déplie la boucle, lie i, encode les écritures en `store` et falsifie les
+# @ensures (select sur l'état final).
+@formalize function kaos_extend_batch_arr(dest::Vector{Real}, r::Real, ss::Vector{Real})::Bool
+    for i in 1:3
+        dest[i] = r + ss[i]
+    end
+    @ensures result == (dest[1] == r + ss[1] && dest[2] == r + ss[2] && dest[3] == r + ss[3])
+    return true
+end
+
+# Scan de dominance en récursion d'état (forme sans sortie anticipée du
+# `front_dominates` réel): found == (∃i ≤ 3, front[i] <= cand).
+@formalize function kaos_front_scan_arr(front::Vector{Real}, cand::Real)::Bool
+    found = false
+    for i in 1:3
+        found = found || (front[i] <= cand)
+    end
+    @ensures result == (front[1] <= cand || front[2] <= cand || front[3] <= cand)
+    return found
+end
 # Bounded-filter rule sanity: with a fixed node lower bound, the filter
 # decision `mincost < incumbent` is monotone in the candidate cost — a
 # costlier label can never be accepted when a cheaper one is rejected.

@@ -65,9 +65,10 @@ SIMD execution:
   are batch-evaluated into a preallocated buffer (`_extend_batch!`, `@simd`
   over contiguous, CSR-packed arc resources): one packed vector add per label
   instead of per-arc scalar adds, with zero allocation.
-- **Dominance** — componentwise `≤` over the resource vector is a `@simd`
-  reduction, and Pareto fronts store resources contiguously for cache-friendly
-  scans.
+- **Dominance** — strict Pareto (`≤` on every component **and** `<` on at
+  least one, per `docs/main.dox`) is a statically-unrolled `@simd`-friendly
+  compare (`all(a .<= b) && any(a .< b)`), and Pareto fronts store resources
+  contiguously for cache-friendly scans.
 
 The label-creation order (and therefore every result, including tie-breaks)
 is identical to the C++ solvers: batching only parallelises the arithmetic,
