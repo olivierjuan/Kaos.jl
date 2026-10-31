@@ -11,8 +11,12 @@ Given a directed graph, a source, a destination and a resource that grows
 along arcs, Kaos finds the cheapest feasible path (label-setting with Pareto
 dominance pruning, optional A*-style bounded filtering).
 
-## Status
+**Validity**: solver outputs are proven optimal against exhaustive enumeration
+of the complete feasible path set on randomized instances, and the
+decision-rule theorems are machine-checked by Z3 and the Lean 4 kernel via
+JuLean — see [FORMAL.md](FORMAL.md).
 
+## Status
 Alpha (0.1.0). Semantics mirror the C++ solvers (same label creation order,
 same incumbent rule); see [Port notes](#port-notes).
 

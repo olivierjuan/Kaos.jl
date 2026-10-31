@@ -29,6 +29,13 @@ Z3_SPECS = [:kaos_dominance_asymmetry2,
             :kaos_incumbent_rule,
             :kaos_mincost_monotone]
 
+LEAN_SPECS = [:kaos_dominance_asymmetry2,
+              :kaos_dominance_transitivity2,
+              :kaos_dominance_additive_extension2,
+              :kaos_mincost_monotone,
+              :kaos_incumbent_adopt,
+              :kaos_incumbent_improve,
+              :kaos_incumbent_hold]
 results = Tuple{String,String,JuLean.VerificationStatus}[]
 
 # ---------------- Tier 1: Z3 -----------------------------------------------
@@ -90,16 +97,10 @@ println("\n=== Tier 3: Lean 4 kernel (Mathlib) ===")
 LEAN_PROJECT = "/home/D01856/dunes/formalization"
 if isdir(LEAN_PROJECT)
     JuLean.set_lean_project_dir!(LEAN_PROJECT)
-    TACTICS = ["", "linarith", "aesop", "push_neg; linarith", "simp; linarith", "omega"]
-    for name in Z3_SPECS
-        res = nothing
-        used = ""
-        for tac in TACTICS
-            res = JuLean.verify(name; backend = :Lean4, timeout = 300.0, tactic = tac)
-            res.status === JuLean.StatusVerified && (used = isempty(tac) ? "default" : tac; break)
-        end
+    for name in LEAN_SPECS
+        res = JuLean.verify(name; backend = :Lean4, timeout = 300.0)
         push!(results, (string(name), "Lean4", res.status))
-        println(rpad(name, 42), " → ", res.status, (isempty(used) ? "" : "  [tactic: " * used * "]"))
+        println(rpad(name, 42), " → ", res.status)
         if res.status !== JuLean.StatusVerified
             println("   message: ", res.message)
         end

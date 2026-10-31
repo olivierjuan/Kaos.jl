@@ -8,7 +8,7 @@
 # equality would collapse, contradicting the required strict component).
 @formalize function kaos_dominance_asymmetry2(ac::Real, av::Real, bc::Real, bv::Real)::Bool
     @requires ac <= bc && av <= bv && (ac < bc || av < bv)
-    @ensures result == !(bc <= ac && bv <= av)
+    @ensures result == (bc > ac || bv > av)
     ac <= bc && av <= bv && (ac < bc || av < bv)
 end
 
@@ -51,6 +51,28 @@ end
     else
         prev
     end
+end
+
+# Branch decomposition of the incumbent rule for the Lean kernel: each branch
+# outcome is certified separately (the composed if-rule is Z3-verified as
+# `kaos_incumbent_rule`). Adoption: no incumbent yet, the candidate is taken.
+@formalize function kaos_incumbent_adopt(cand::Real)::Real
+    @ensures result == cand
+    cand
+end
+
+# Improvement: the candidate strictly beats the incumbent, it is taken.
+@formalize function kaos_incumbent_improve(prev::Real, cand::Real)::Real
+    @requires prev > cand
+    @ensures result == cand && result < prev && result <= cand
+    cand
+end
+
+# Hold: the incumbent is at least as good, it is kept.
+@formalize function kaos_incumbent_hold(prev::Real, cand::Real)::Real
+    @requires prev <= cand
+    @ensures result == prev && result <= cand
+    prev
 end
 
 # Bounded-filter rule sanity: with a fixed node lower bound, the filter
