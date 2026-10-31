@@ -126,7 +126,7 @@ Kaos.arc_resource(::Nothing, s) = s  # additive stub so the default extend appli
     ss = [randn(SVector{N,Float64}) for _ in 1:257]
     dests = Vector{SVector{N,Float64}}(undef, 257)
     Kaos._extend_batch!(dests, nothing, rs[1], ss, 0, 257)  # additive default: p unused
-    @test all(Kaos.dominates(a, b) == all(a .<= b) for a in rs, b in ss)
+    @test all(Kaos.dominates(a, b) == (all(a .<= b) && any(a .< b)) for a in rs, b in ss)
 end
 
 @testset "unreachable destination" begin

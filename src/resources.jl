@@ -16,18 +16,19 @@ to `r` itself for numbers. Port of `Resource::cost()`.
 """
     dominates(a, b) -> Bool
 
-Weak componentwise dominance `a ≤ b` for `SVector` resources, port of the
-canonical `Problem::dominates` (`a.cost() <= b.cost() && a.value() <= b.value()`
-generalised to every component). The per-component compare is a register-SIMD
-reduction (`@simd` over a statically sized vector).
+Strict Pareto dominance of resource `a` over `b`, exactly as specified in the
+library documentation (`docs/main.dox`, DOMINANCE): `a` dominates `b` iff
+`a[i] <= b[i]` for every component **and** `a[i] < b[i]` for at least one.
+Consequently Pareto-equivalent labels (equal resources) are *not* dominated
+and all of them stay extensible, as the NodeSolver/PathSolver specifications
+require.
 
-Custom resource types must implement `dominates(a, b)`; problems may override
-the problem-level `dominates(problem, a, b)`.
+The compares are statically unrolled by StaticArrays (`all(a .<= b) &&
+any(a .< b)`), keeping the hot path branch-light and allocation-free. Custom
+resource types must implement
+`dominates(a, b)`; problems may override the problem-level
+`dominates(problem, a, b)` (the C++ `TestProblem` uses the weaker
+`a <= b` componentwise relation, reproduced by its Julia port for parity).
 """
-@inline function dominates(a::SVector{N,T}, b::SVector{N,T}) where {N,T<:Real}
-    ok = true
-    @inbounds @simd for i in 1:N
-        ok &= a[i] <= b[i]
-    end
-    return ok
-end
+@inline dominates(a::SVector{N,T}, b::SVector{N,T}) where {N,T<:Real} =
+    all(a .<= b) && any(a .< b)

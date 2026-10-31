@@ -75,6 +75,10 @@ never the control flow.
 - `ParetoFrontValid`'s consuming-iterator quirk (first entry of a non-empty
   front is always re-yielded, re-extending an already-extended label) is
   **fixed** in the port: an entry is extended at most once.
+- **Dominance**: the default `dominates` follows `docs/main.dox` (strict
+  Pareto: `≤` on every component **and** `<` on at least one), not the weaker
+  `≤,≤` relation hard-coded in the C++ `TestProblem` — that weaker relation is
+  kept as an explicit problem-level override for C++ test parity.
 - `path_argmin` counts children for real (the C++ `NoCounter` short-circuit
   made every label look terminal); terminal means *no child label*.
 - `ActionLog` is not ported: it is compiled out in the default C++ build

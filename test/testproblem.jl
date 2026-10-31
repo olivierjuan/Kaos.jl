@@ -67,6 +67,9 @@ Kaos.arc_resource(p::TestProblem, a) = p.arc_res[a]
 Kaos.is_feasible(p::TestProblem, r, n) = r[2] <= 4.0
 Kaos.node_priority(p::TestProblem, n) = -p.coords[n][1]
 Kaos.path_priority(p::TestProblem, r, n) = r[2]
+# The C++ TestProblem uses the weaker componentwise `a <= b` dominance instead
+# of the documented strict Pareto dominance; kept for test parity with C++.
+Kaos.dominates(p::TestProblem, a, b) = all(a .<= b)
 
 """
     best_path_oracle(p::TestProblem) -> (cost, nodes, arcs)
