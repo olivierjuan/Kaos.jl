@@ -1,6 +1,7 @@
 # Kaos.jl — preuve de validité de bout en bout
 
-Statut : **12/12 spécifications machine-vérifiées** (Z3 + noyau Lean 4/Mathlib),
+Statut : **15/15 vérifications machine** — Z3 (5 règles sur ℚ), BMC (2 noyaux
+boucle/tableaux), noyau Lean 4 + Mathlib (8, sans `sorry`) —,
 **5 445 assertions end-to-end vertes** sur 100 instances aléatoires.
 Harnais : `formal/verify_kernels.jl` (`julia --project=formal formal/verify_kernels.jl`).
 Approche Sirocco.jl : tout le code de vérification vit dans `ext/KaosJuLeanExt`
