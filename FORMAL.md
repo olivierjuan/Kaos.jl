@@ -105,6 +105,11 @@ boucles et tableaux à la transpilation Lean et en BMC pour les récursions
 d'état ; l'écart porte sur la *preuve* de propriétés quantifiées sur tableaux
 et sur la variable de boucle.
 
+### Voie A : Preuve mécanique d'optimalité globale
+La feuille de route d'ingénierie formelle pour prouver de bout en bout l'optimalité
+du solveur via le système de transition et invariant inductif en Lean 4 est spécifiée
+dans [RCSPP_DESIGN.md](RCSPP_DESIGN.md).
+
 ## 4. Reproduction
 
 ```bash
