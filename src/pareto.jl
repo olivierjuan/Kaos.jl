@@ -9,10 +9,12 @@
     ExtensibleFront{R}()
 
 Per-node Pareto front of efficient labels that still deserve extension; port of
-`rcspp::ParetoFrontValid`. Iteration is *consuming* and reproduces the C++
-iterator exactly: the first entry of a non-empty front is always yielded (even
-if already consumed, the C++ `begin()` does not skip), later entries only when
-still flagged extensible, and each yielded entry loses its flag.
+`rcspp::ParetoFrontValid`. Iteration is *consuming*: an entry is yielded at
+most once, exactly when it is still flagged extensible.
+
+Intentional fix over the C++ original: its `begin()` did not skip a consumed
+first entry, so re-popping a node re-extended an already-extended label —
+wasted work that weak dominance filtered afterwards anyway.
 """
 mutable struct ExtensibleFront{R}
     index::Vector{Int}
@@ -66,20 +68,16 @@ function front_dominates(p, f::ExtensibleFront{R}, r::R) where {R}
     return false
 end
 
-# Consuming iteration with the exact C++ ParetoFrontValid semantics: the first
-# entry is yielded unconditionally, then only entries still flagged extensible.
+# Consuming iteration: only entries still flagged extensible are yielded, and
+# yielding clears the flag. (C++ ParetoFrontValid re-yielded the first entry of
+# a non-empty front unconditionally; fixed here per the obvious intent.)
 Base.iterate(f::ExtensibleFront) = _front_iterate(f, 0)
 Base.iterate(f::ExtensibleFront, s::Int) = _front_iterate(f, s)
 
 function _front_iterate(f::ExtensibleFront, s::Int)
     idx = f.index
     ext = f.extendable
-    if s == 0
-        isempty(idx) && return nothing
-        @inbounds ext[1] = false
-        return @inbounds idx[1], 1
-    end
-    @inbounds for i in (s + 1):length(idx)
+    @inbounds for i in (s == 0 ? 1 : s + 1):length(idx)
         if ext[i]
             ext[i] = false
             return idx[i], i

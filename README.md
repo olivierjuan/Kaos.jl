@@ -73,7 +73,8 @@ never the control flow.
   `ParetoFrontNew`, `BasicPathFilter`, `BoundedPathFilter` and
   `BasicDirectedGraph` (1-based ids instead of 0-based).
 - `ParetoFrontValid`'s consuming-iterator quirk (first entry of a non-empty
-  front is always re-yielded) is reproduced exactly.
+  front is always re-yielded, re-extending an already-extended label) is
+  **fixed** in the port: an entry is extended at most once.
 - `path_argmin` counts children for real (the C++ `NoCounter` short-circuit
   made every label look terminal); terminal means *no child label*.
 - `ActionLog` is not ported: it is compiled out in the default C++ build
