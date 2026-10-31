@@ -1,3 +1,6 @@
+[![CI](https://github.com/olivierjuan/Kaos.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/olivierjuan/Kaos.jl/actions/workflows/CI.yml)
+[![Docs](https://img.shields.io/badge/docs-dev-blue.svg)](https://olivierjuan.github.io/Kaos.jl/dev/)
+
 # Kaos.jl
 
 Resource-constrained shortest path (RCSPP) label-setting solvers for Julia —

@@ -1,4 +1,4 @@
-Manifest.toml
+docs/build/
 *.jl.cov
 *.jl.*.cov
 *.deps.jl

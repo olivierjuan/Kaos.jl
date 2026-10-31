@@ -7,9 +7,10 @@ import Base: push!, pop!, isempty
 """
     PriorityHeap{K,P}()
 
-Binary heap of keys with priorities. Port of `rcspp::Heap`: [`pop!`](@ref)
-returns the key with the **largest** priority (callers pass negated priorities
-to get min-first behaviour, exactly like the C++ code).
+Binary heap of keys with priorities, port of `rcspp::Heap`. [`init!`](@ref)
+seeds it, `push!(h, key, priority)` inserts, and `pop!(h)` removes and returns
+the key with the **largest** priority (callers pass negated priorities to get
+min-first behaviour, exactly like the C++ code built on `std::make_heap`).
 """
 mutable struct PriorityHeap{K,P}
     const data::Vector{Tuple{P,K}}
@@ -28,7 +29,6 @@ function init!(h::PriorityHeap{K,P}, key) where {K,P}
     return h
 end
 
-"Insert `key` at `priority` (port of `Heap::insert` / `std::push_heap`)."
 function push!(h::PriorityHeap{K,P}, key, priority) where {K,P}
     data = h.data
     push!(data, (priority, key))
@@ -42,7 +42,6 @@ function push!(h::PriorityHeap{K,P}, key, priority) where {K,P}
     return h
 end
 
-"Remove and return the key with the largest priority (port of `pop_back`)."
 function pop!(h::PriorityHeap{K}) where {K}
     data = h.data
     isempty(data) && throw(ArgumentError("heap is empty"))

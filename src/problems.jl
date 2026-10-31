@@ -79,10 +79,42 @@ supplies `-(cost to go)` itself.
 """
 function path_priority end
 
-# Required interface: declared without default methods so that concrete
-# problems extend them (`Kaos.graph(p) = ...` or `import Kaos: graph`).
+"""
+    graph(p) -> BasicDirectedGraph
+
+**Required** problem interface: the graph being searched (port of
+`Problem::graph`). Must have been frozen with [`close!`](@ref).
+"""
 function graph end
+
+"""
+    source_node(p) -> Int
+
+**Required** problem interface: the node paths start from (port of
+`get_source_node`).
+"""
 function source_node end
+
+"""
+    dest_node(p) -> Int
+
+**Required** problem interface: the node paths must reach (port of
+`get_dest_node`).
+"""
 function dest_node end
+
+"""
+    initial_resource(p)
+
+**Required** problem interface: the resource carried at the source (port of
+`get_initial_resource`).
+"""
 function initial_resource end
+
+"""
+    arc_resource(p, a)
+
+**Required** problem interface: the resource vector consumed by traversing arc
+`a` (the per-arc data feeding [`extend_resource`](@ref) and [`arc_cost`](@ref)).
+"""
 function arc_resource end
