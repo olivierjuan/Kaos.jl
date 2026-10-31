@@ -1,0 +1,8 @@
+[deps]
+Kaos = "2eb1110e-a7c5-42f1-bfc0-20b3dfaefc1f"
+JuLean = "60d1f2a1-a197-4d78-8ba3-1a6337fe4745"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[sources]
+Kaos = {path = ".."}
+JuLean = {path = "../../../dunes/JuLean.jl"}

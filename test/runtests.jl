@@ -3,6 +3,7 @@ using Kaos
 using StaticArrays: SVector
 
 include("testproblem.jl")
+include("test_formal_verification.jl")
 
 """
     ReachabilityProblem

@@ -6,6 +6,11 @@ version = "0.1.0"
 [deps]
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
+[weakdeps]
+JuLean = "60d1f2a1-a197-4d78-8ba3-1a6337fe4745"
+
+[extensions]
+KaosJuLeanExt = "JuLean"
 [compat]
 StaticArrays = "1"
 julia = "1.10"
