@@ -23,7 +23,7 @@ Accepts every feasible extension, port of `rcspp::PathFilter`. Path priority
 delegates to `path_priority(problem, r, n)`.
 """
 struct BasicFilter <: AbstractPathFilter end
-
+BasicFilter(p::AbstractRCSProblem) = BasicFilter()  # uniform `filter(problem)` construction
 @inline is_candidate(::BasicFilter, p, r, n, incumbent) = true
 
 path_priority(::BasicFilter, p, r, n) = path_priority(p, r, n)

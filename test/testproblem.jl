@@ -46,6 +46,7 @@ function TestProblem()
     ]
     arc_res = SVector{2,Float64}[]
     for (s, t) in arcs
+        Kaos.add_arc!(g, s, t)
         x_s, y_s = coords[s]
         x_t, y_t = coords[t]
         dx = x_t - x_s

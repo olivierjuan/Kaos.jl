@@ -77,3 +77,12 @@ Label selection priority for the basic [`PathSolver`](@ref), port of
 `getPathPriority`. The heap pops the largest priority first; the bounded filter
 supplies `-(cost to go)` itself.
 """
+function path_priority end
+
+# Required interface: declared without default methods so that concrete
+# problems extend them (`Kaos.graph(p) = ...` or `import Kaos: graph`).
+function graph end
+function source_node end
+function dest_node end
+function initial_resource end
+function arc_resource end

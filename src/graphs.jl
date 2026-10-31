@@ -17,7 +17,7 @@ The adjacency is stored in CSR form (`out_start`/`out_arc`/`out_node` and
 which keeps the solver hot loop allocation-free.
 """
 mutable struct BasicDirectedGraph
-    const node_count::Int
+    node_count::Int
     closed::Bool
     const arc_src::Vector{Int}
     const arc_dst::Vector{Int}
@@ -31,7 +31,6 @@ mutable struct BasicDirectedGraph
     BasicDirectedGraph() =
         new(0, false, Int[], Int[], Int[], Int[], Int[], Int[], Int[], Int[])
 end
-
 "Number of nodes, port of `node_number()`."
 node_count(g::BasicDirectedGraph) = g.node_count
 

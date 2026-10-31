@@ -51,37 +51,21 @@ arc_path(sol::Solution) = sol.table.incumbent_index == 0 ? Int[] : arc_path(sol.
 
 "Cost of the incumbent path (`typemax` when the destination is unreachable)."
 incumbent_cost(sol::Solution) = incumbent_cost(sol.table)
-
-# Batch-evaluate `extend_resource(p, r, s)` for every out-arc resource of the
-# popped label. `out_res` is CSR-aligned (packed, contiguous), `dests` is a
-# preallocated scratch; with SVector resources each iteration is a vector add
-# and LLVM keeps the whole loop free of allocation and branches.
-@inline function _extend_batch!(dests, p, r, out_res, lo, nout)
+@inline function _extend_batch!(dests, p, r, out_arc, lo, nout)
     @inbounds @simd for j in 1:nout
-        dests[j] = extend_resource(p, r, @inbounds(out_res[lo + j]))
+        dests[j] = extend_resource(p, r, @inbounds(out_arc[lo + j]))
     end
 end
-
-# Shared per-solve precomputation: resource of every arc (by arc id, used by
-# the bounded filter) and the same resources packed in CSR out-arc order (used
-# by the batched extension), plus a scratch buffer for the batch.
-function _arc_layout(p::AbstractRCSProblem, R::Type)
+# Preallocated scratch for batched sub-path extension, sized to the max
+# out-degree of the graph.
+function _dests_scratch(p::AbstractRCSProblem, R::Type)
     g = graph(p)
-    m = arc_count(g)
-    arc_res = Vector{R}(undef, m)
-    @inbounds for a in 1:m
-        arc_res[a] = arc_resource(p, a)
-    end
-    out_res = Vector{R}(undef, m)
-    @inbounds for pos in 1:m
-        out_res[pos] = @inbounds(arc_res[g.out_arc[pos]])
-    end
     maxdeg = 0
     @inbounds for v in 1:node_count(g)
         d = g.out_start[v + 1] - g.out_start[v]
         maxdeg = ifelse(d > maxdeg, d, maxdeg)
     end
-    return arc_res, out_res, Vector{R}(undef, maxdeg)
+    return Vector{R}(undef, maxdeg)
 end
 
 """
@@ -117,7 +101,7 @@ function solve(p::AbstractRCSProblem, ::Type{NodeSolver}, ::Type{F}) where {F<:A
     in_heap = fill(false, n)
     in_heap[src] = true
 
-    _, out_res, dests = _arc_layout(p, R)
+    dests = _dests_scratch(p, R)
 
     while !isempty(heap)
         origin = pop!(heap)
@@ -127,7 +111,7 @@ function solve(p::AbstractRCSProblem, ::Type{NodeSolver}, ::Type{F}) where {F<:A
         nout = g.out_start[origin + 1] - lo
         for pi in front  # consuming iteration, C++ ParetoFrontValid semantics
             r = @inbounds table.resource[pi]
-            _extend_batch!(dests, p, r, out_res, lo, nout)
+            _extend_batch!(dests, p, r, g.out_arc, lo, nout)
             @inbounds for j in 1:nout
                 pos = lo + j
                 dn = g.out_node[pos]
@@ -170,7 +154,7 @@ function solve(p::AbstractRCSProblem, ::Type{PathSolver}, ::Type{F}) where {F<:A
     heap = PriorityHeap{Int,P}()
     init!(heap, 1)
 
-    _, out_res, dests = _arc_layout(p, R)
+    dests = _dests_scratch(p, R)
 
     while !isempty(heap)
         pi = pop!(heap)
@@ -178,7 +162,7 @@ function solve(p::AbstractRCSProblem, ::Type{PathSolver}, ::Type{F}) where {F<:A
         r = @inbounds table.resource[pi]
         lo = g.out_start[origin]
         nout = g.out_start[origin + 1] - lo
-        _extend_batch!(dests, p, r, out_res, lo, nout)
+        _extend_batch!(dests, p, r, g.out_arc, lo, nout)
         @inbounds for j in 1:nout
             pos = lo + j
             dn = g.out_node[pos]
