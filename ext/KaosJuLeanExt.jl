@@ -20,6 +20,7 @@ const KERNEL_FUNCTIONS = [
     Kaos.add_path!,
     Kaos.update_incumbent!,
     Kaos.is_candidate,
+    Kaos.solve,
 ]
 
 const KERNEL_NAMES = [nameof(f) for f in KERNEL_FUNCTIONS]

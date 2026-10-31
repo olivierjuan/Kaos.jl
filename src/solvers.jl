@@ -87,6 +87,14 @@ Run a label-setting search for the resource-constrained shortest path of
 The graph must be [`close!`](@ref)d. Label creation order matches the C++
 solvers; the returned [`Solution`](@ref) exposes `node_path`, `arc_path`,
 `incumbent_cost` and the raw `paths` table.
+
+# Contracts
+- `@requires graph(p).closed`
+- `@invariant table.incumbent_index == 0 || is_feasible(p, table.resource[table.incumbent_index], dest_node(p))`
+- `@ensures isempty(node_path(result)) || node_path(result)[1] == source_node(p)`
+- `@ensures isempty(node_path(result)) || node_path(result)[end] == dest_node(p)`
+- `@ensures isempty(node_path(result)) || is_feasible(p, paths(result).resource[paths(result).incumbent_index], dest_node(p))`
+- `@ensures isempty(node_path(result)) || (incumbent_cost(result) == resource_cost(paths(result).resource[paths(result).incumbent_index]))`
 """
 function solve(p::AbstractRCSProblem, ::Type{NodeSolver}, ::Type{F}) where {F<:AbstractPathFilter}
     g = graph(p)
