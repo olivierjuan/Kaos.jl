@@ -23,6 +23,8 @@ using Kaos
 
     # 1. Extension Verification
     @testset "1. Extension Initialization & Registry" begin
+        @test isdefined(Kaos, :verify_formal_specifications)
+        @test isdefined(Kaos, :export_lean_specifications)
         EXT = Base.get_extension(Kaos, :KaosJuLeanExt)
         @test EXT isa Module
 
@@ -34,16 +36,9 @@ using Kaos
 
     # 2. Tier 1: Z3 SMT Verification Sweep
     @testset "2. Tier 1: Z3 Falsification over ℚ" begin
-        Z3_SPECS = [
-            :kaos_dominance_asymmetry2,
-            :kaos_dominance_transitivity2,
-            :kaos_dominance_additive_extension2,
-            :kaos_incumbent_rule,
-            :kaos_mincost_monotone
-        ]
-        for name in Z3_SPECS
-            res = JuLean.verify(name; backend = :Z3)
-            @test res.status === JuLean.StatusVerified
+        results_z3 = Kaos.verify_formal_specifications(backend = :Z3)
+        for (name, res) in results_z3
+            @test JuLean.is_verified(res)
         end
     end
 
@@ -83,13 +78,9 @@ using Kaos
 
     # 4. Tier 2: BMC Verification
     @testset "4. Tier 2: BMC Array & Loop Verification" begin
-        BMC_SPECS = [
-            (:kaos_extend_batch_arr, 4),
-            (:kaos_front_scan_arr, 4)
-        ]
-        for (name, depth) in BMC_SPECS
-            res = JuLean.verify(name; backend = :BMC, depth = depth)
-            @test res.status === JuLean.StatusVerified
+        results_bmc = Kaos.verify_formal_specifications(backend = :BMC)
+        for (name, res) in results_bmc
+            @test JuLean.is_verified(res)
         end
     end
 
@@ -98,19 +89,8 @@ using Kaos
         LEAN_PROJECT = "/home/D01856/dunes/formalization"
         if isdir(LEAN_PROJECT)
             JuLean.set_lean_project_dir!(LEAN_PROJECT)
-            LEAN_SPECS = [
-                (:kaos_dominance_asymmetry2, ""),
-                (:kaos_dominance_transitivity2, ""),
-                (:kaos_dominance_additive_extension2, ""),
-                (:kaos_mincost_monotone, ""),
-                (:kaos_incumbent_adopt, ""),
-                (:kaos_incumbent_improve, ""),
-                (:kaos_incumbent_hold, ""),
-                (:kaos_incumbent_rule,
-                 "cases has_inc <;> simp [kaos_incumbent_rule] <;> by_cases h : prev > cand <;> simp [h] <;> linarith")
-            ]
-            for (name, tac) in LEAN_SPECS
-                res = JuLean.verify(name; backend = :Lean4, timeout = 300.0, tactic = tac)
+            results_lean = Kaos.verify_formal_specifications(backend = :Lean4)
+            for (name, res) in results_lean
                 @test res.status === JuLean.StatusVerified
             end
         end

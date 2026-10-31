@@ -13,6 +13,7 @@ JuLean = "60d1f2a1-a197-4d78-8ba3-1a6337fe4745"
 KaosJuLeanExt = "JuLean"
 [compat]
 StaticArrays = "1"
+JuLean = "1.1"
 julia = "1.10"
 
 [extras]
