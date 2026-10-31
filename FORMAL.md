@@ -62,6 +62,33 @@ noyaux RÉELS Julia ────contrats DbC + martelage aléatoire──▶ con
 solveur complet ──────énumération exhaustive + Dijkstra ind.──▶ optimaux, bout en bout
 ```
 
+## 3bis. Capacité de l'outillage, mesurée (expériences + lecture du code)
+
+Le solveur est décomposable à volonté (`_extend_batch!`, `front_dominates`,
+`add_dominant!`, sift du heap sont déjà des fonctions isolées) — le facteur
+limitant est l'outillage, pas la structure :
+
+| Voie JuLean | Ce qui passe | Ce qui bloque (mesuré) |
+|---|---|---|
+| Z3 direct | tout corps sans boucle (les 5 règles, cf. Tier 1) | boucles : `body_has_loops` → `StatusUnverified` assumé |
+| Lean 4 (transpilateur) | boucles `for` + mutations `arr[i] =` (§4 du README : `Id.run do`/`let mut`/`set!`) — **transpilation observée OK** | preuve de posts quantifiés sur tableaux : induction absente du pipeline de tactiques (`unsolved goals`) |
+| Lean 4 (tactiques custom) | tactiques simples | JuLean émet `theorem ... := <tactique>` hors bloc `by` → toute tactique multi-jetons = ParseError (`unexpected token '<;>'`) |
+| BMC (`bmc.jl`) | invariants de récursions d'état pures (`total = total + s`) à profondeur bornée | la variable de boucle n'est pas modélisée (`loop_cond = true` pour les `for`, `i` libre non contraint → contre-exemples factices), pas de `Array` SMT, `@ensures` hors de la requête, sorties anticipées non modélisées |
+
+Conséquence pratique : les quatre boucles chaudes de Kaos (extension batchée
+par arc, scans de dominance à sortie anticipée, compaction d'ordre préservé,
+sift de tas) référencent toutes la variable de boucle et/ou des tableaux —
+**au-delà du BMC actuel**, quel que soit le découpage de `solve`. Les specs
+droites (sans boucle) sont couvertes par Z3/Lean ; les boucles, par les
+contrats DbC + la validation exhaustive. Levier côté JuLean : modéliser la
+variable de boucle + `select/store` SMT dans le BMC, et émettre les tactiques
+custom dans un bloc `by` avec induction pour les posts sur tableaux.
+
+Correction honnête d'une affirmation antérieure de ce dépôt : JuLean *gère*
+boucles et tableaux à la transpilation Lean et en BMC pour les récursions
+d'état ; l'écart porte sur la *preuve* de propriétés quantifiées sur tableaux
+et sur la variable de boucle.
+
 ## 4. Reproduction
 
 ```bash
