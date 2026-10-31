@@ -31,6 +31,15 @@ end
 
 Append a label extending `parent` over `arc` into `node` with resource `r`
 (port of `Paths::addPath`) and return its index.
+
+# Contracts
+- `@requires 1 <= parent <= length(t.node)`
+- `@requires 1 <= node`
+- `@requires 1 <= arc`
+- `@ensures result == length(t.node)`
+- `@ensures t.parent[result] == parent && t.node[result] == node && t.arc[result] == arc`
+- `@ensures t.resource[result] == r`
+- `@ensures t.children[parent] >= 1`
 """
 @inline function add_path!(t::PathTable, r, node::Integer, arc::Integer, parent::Integer)
     push!(t.resource, r)
@@ -49,6 +58,11 @@ end
 Record label `i` as reaching the destination; adopt it as the incumbent when it
 strictly improves the cost (first label wins ties, as in the C++). Returns
 whether a new incumbent was adopted (port of `update_incumbent_path`).
+
+# Contracts
+- `@requires 1 <= i <= length(t.node)`
+- `@ensures !result || (t.incumbent_index == i)`
+- `@ensures t.incumbent_cost <= resource_cost(t.resource[i])`
 """
 @inline function update_incumbent!(t::PathTable, i::Integer)
     candidate = resource_cost(t.resource[i])

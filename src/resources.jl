@@ -29,6 +29,9 @@ resource types must implement
 `dominates(a, b)`; problems may override the problem-level
 `dominates(problem, a, b)` (the C++ `TestProblem` uses the weaker
 `a <= b` componentwise relation, reproduced by its Julia port for parity).
+
+# Contracts
+- `@ensures result == (all(a .<= b) && any(a .< b))`
 """
 @inline dominates(a::SVector{N,T}, b::SVector{N,T}) where {N,T<:Real} =
     all(a .<= b) && any(a .< b)

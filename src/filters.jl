@@ -76,6 +76,15 @@ end
 "Lower bound of the total cost of any completion of resource `r` at node `n`."
 @inline mincost(f::BoundedFilter, r, n) = resource_cost(r) + f.node_bounds[n]
 
+"""
+    is_candidate(f::BoundedFilter, p, r, n, incumbent) -> Bool
+
+True when `mincost(f, r, n) < incumbent`.
+
+# Contracts
+- `@requires incumbent >= 0`
+- `@ensures result == (resource_cost(r) + f.node_bounds[n] < incumbent)`
+"""
 @inline function is_candidate(f::BoundedFilter, p, r, n, incumbent)
     return mincost(f, r, n) < incumbent
 end

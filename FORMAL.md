@@ -37,11 +37,16 @@ liée à l'itération dépliée, accumulateur Bool). Sémantique vérifiée :
 « après exactement `depth` itérations complètes, invariants et postconditions
 tiennent » — la sortie anticipée de boucle reste hors modèle.
 
-### Tier 0 — contrats DbC sur les noyaux RÉELS (exécution)
+### Tier 0 — contrats DbC dans les docstrings des noyaux RÉELS (exécution)
 
-64 000 appels contractuels (`@requires`/`@ensures` actifs) martelés sur données
-aléatoires : `dbc_dominates` (20 000 paires, N∈2..4), `dbc_add_path!` +
-`dbc_update_incumbent!` (24 000 appels), `dbc_is_candidate_bounded` (20 000
+Conformément à `AGENTS.md` (motif Sirocco), les contrats (`@requires`, `@ensures`)
+vivent directement dans les docstrings Markdown des fonctions de `src/` (`Kaos.dominates`,
+`Kaos.add_path!`, `Kaos.update_incumbent!`, `Kaos.is_candidate`), sans aucun surcoût ni
+dépendance en production.
+
+Via `JuLean.contracted(...)`, 64 000 appels contractuels sont martelés sur données
+aléatoires dans `formal/verify_kernels.jl` : `Kaos.dominates` (20 000 paires, N∈2..4),
+`Kaos.add_path!` + `Kaos.update_incumbent!` (24 000 appels), `Kaos.is_candidate` (20 000
 triples). Toute divergence des noyaux réels par rapport aux specs ci-dessus
 lèverait `ContractViolationError`.
 

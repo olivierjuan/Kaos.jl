@@ -51,6 +51,14 @@ arc_path(sol::Solution) = sol.table.incumbent_index == 0 ? Int[] : arc_path(sol.
 
 "Cost of the incumbent path (`typemax` when the destination is unreachable)."
 incumbent_cost(sol::Solution) = incumbent_cost(sol.table)
+"""
+    _extend_batch!(dests, p, r, out_arc, lo, nout)
+
+Batch-evaluates all out-arc extensions into `dests`.
+
+# Contracts
+- `@requires 0 <= nout`
+"""
 @inline function _extend_batch!(dests, p, r, out_arc, lo, nout)
     @inbounds @simd for j in 1:nout
         dests[j] = extend_resource(p, r, @inbounds(out_arc[lo + j]))

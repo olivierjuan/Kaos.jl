@@ -59,6 +59,9 @@ end
     front_dominates(p, f, r) -> Bool
 
 True when any stored label dominates `r` (port of `ParetoFrontValid::dominates`).
+
+# Contracts
+- `@ensures !result || any(k -> dominates(p, f.resource[k], r), eachindex(f.resource))`
 """
 function front_dominates(p, f::ExtensibleFront{R}, r::R) where {R}
     res = f.resource
@@ -121,7 +124,14 @@ function add_dominant!(p, f::EfficientFront{R}, i::Integer, r::R) where {R}
     return _push_entry!(f, i, r)
 end
 
-"True when any stored label dominates `r` (port of `ParetoFrontNew::dominates`)."
+"""
+    front_dominates(p, f::EfficientFront, r) -> Bool
+
+True when any stored label dominates `r` (port of `ParetoFrontNew::dominates`).
+
+# Contracts
+- `@ensures !result || any(k -> dominates(p, f.resource[k], r), eachindex(f.resource))`
+"""
 function front_dominates(p, f::EfficientFront{R}, r::R) where {R}
     res = f.resource
     @inbounds for k in eachindex(res)

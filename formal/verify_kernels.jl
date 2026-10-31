@@ -56,9 +56,15 @@ for name in Z3_SPECS
     @assert ok "Z3 could not verify $name: $(res.message)"
 end
 
-# ---------------- Tier 0: DbC hammering on the real kernels ----------------
-println("\n=== Tier 0: runtime contracts on the real kernels (hammering) ===")
+# ---------------- Tier 0: DbC hammering on the real kernels (from docstrings) -
+println("\n=== Tier 0: runtime contracts on the real kernels (docstring reflection) ===")
 JuLean.enable_contracts!(true)
+
+const chk_dominates = JuLean.contracted(Kaos.dominates)
+const chk_add_path! = JuLean.contracted(Kaos.add_path!)
+const chk_update_incumbent! = JuLean.contracted(Kaos.update_incumbent!)
+const chk_is_candidate = JuLean.contracted(Kaos.is_candidate)
+
 function tier0_hammering(rng)
     n_dom = 0
     for _ in 1:20000
@@ -66,7 +72,7 @@ function tier0_hammering(rng)
         a = SVector{N}((randn(rng) for _ in 1:N))
         b = SVector{N}((randn(rng) for _ in 1:N))
         n_dom += 1
-        EXT.dbc_dominates(a, b)
+        chk_dominates(a, b)
     end
 
     n_path = 0
@@ -76,8 +82,8 @@ function tier0_hammering(rng)
             node = 1 + rand(rng, 1:5)
             arc = 1 + rand(rng, 1:9)
             r = SVector(step * 0.25, 0.1)
-            i = EXT.dbc_add_path!(t, r, node, arc, length(t.node))
-            EXT.dbc_update_incumbent!(t, i)
+            i = chk_add_path!(t, r, node, arc, length(t.node))
+            chk_update_incumbent!(t, i)
             n_path += 2
         end
     end
@@ -86,16 +92,15 @@ function tier0_hammering(rng)
     for _ in 1:20000
         c = randn(rng); b = abs(randn(rng)); inc = abs(randn(rng))
         n_cand += 1
-        EXT.dbc_is_candidate_bounded(c, b, inc)
+        chk_is_candidate(Kaos.BoundedFilter([b]), nothing, SVector(c, 0.0), 1, inc)
     end
     return n_dom, n_path, n_cand
 end
 
 (n_dom, n_path, n_cand) = tier0_hammering(MersenneTwister(7))
-println("dbc_dominates: ", n_dom, " random pairs, contracts OK")
-println("dbc_add_path!/dbc_update_incumbent!: ", n_path, " contract-checked calls, contracts OK")
-println("dbc_is_candidate_bounded: ", n_cand, " random triples, contracts OK")
-
+println("Kaos.dominates: ", n_dom, " random pairs, docstring contracts OK")
+println("Kaos.add_path! / Kaos.update_incumbent!: ", n_path, " contract-checked calls, docstring contracts OK")
+println("Kaos.is_candidate: ", n_cand, " random triples, docstring contracts OK")
 
 # ---------------- Tier 2: BMC (loop variable + arrays + ensures) ------------
 println("\n=== Tier 2: BMC (boucle liée, tableaux SMT, @ensures) ===")
