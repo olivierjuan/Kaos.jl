@@ -4,6 +4,7 @@ using StaticArrays: SVector
 
 include("testproblem.jl")
 include("test_formal_verification.jl")
+include("test_refinement.jl")
 
 """
     ReachabilityProblem
